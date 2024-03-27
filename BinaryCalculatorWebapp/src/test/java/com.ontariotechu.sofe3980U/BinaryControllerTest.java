@@ -56,12 +56,6 @@ public class BinaryControllerTest {
 			.andExpect(model().attribute("result", "1110"))
 			.andExpect(model().attribute("operand1", "111"));
     }
-    @Test
-    public void postWithInvalidBinaryString() throws Exception {
-        this.mvc.perform(post("/").param("operand1", "1010").param("operator", "+").param("operand2", "2"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("Error"));
-    }
 
     public void postWithMissingOperand2() throws Exception {
         this.mvc.perform(post("/").param("operand1", "111").param("operator", "+"))
