@@ -74,3 +74,23 @@ spec:
     }
   }
 }
+podTemplate(
+    cloud: 'kubernetes',
+    label: 'mypod',
+    containers: [
+        containerTemplate(
+            name: 'maven',
+            image: 'maven:3.6.3-jdk-11',
+            command: 'cat',
+            ttyEnabled: true,
+            resourceRequestCpu: '500m',
+            resourceRequestMemory: '1Gi',
+            resourceLimitCpu: '1',
+            resourceLimitMemory: '2Gi',
+            envVars: [
+                key: 'MAVEN_OPTS',
+                value: '-Xmx1024m'
+            ]
+        )
+    ]
+)
