@@ -1,9 +1,7 @@
 pipeline {
   environment {
-    //PROJECT = "REPLACE_WITH_YOUR_PROJECT_ID"
-	PROJECT = "green-tract-379622"
+    PROJECT = "useful-variety-415821"
     APP_NAME = "binary-calculator2"
-	//CLUSTER = "REPLACE_WITH_YOUR_CLUSTER_NAME"
     CLUSTER = "sofe3980u"
     CLUSTER_ZONE = "northamerica-northeast1-b"
     IMAGE_TAG = "gcr.io/${PROJECT}/${APP_NAME}"
@@ -12,21 +10,20 @@ pipeline {
   
 agent {
     kubernetes {
-	label 'sample-app'
+      label 'sample-app'
       defaultContainer 'jnlp'
       yaml """
 apiVersion: v1
 kind: Pod
 metadata:
-labels:
-  component: ci
+  labels:
+    component: ci
 spec:
   # Use service account that can deploy to all namespaces
   serviceAccountName: cd-jenkins
   containers:
   - name: gcloud
     image: gcr.io/cloud-builders/gcloud
-    //image: google/cloud-sdk:latest
     command:
     - cat
     tty: true
@@ -36,32 +33,42 @@ spec:
     - cat
     tty: true
 """
-}
+    }
   }
+  
   tools {
     maven 'maven' 
   }
+  
   stages {
     stage ('Init') {
       steps {
-	    checkout scm
+        checkout scm
         sh 'echo "Start of Job"'
       }
     }
-    //stage ('test') {
-    //  steps {
-    //    sh 'mvn clean test -f ./BinaryCalculatorWebapp/pom.xml'
-    //  }
-    //}
+    
     stage ('build') {
       steps {
         sh 'mvn package -DskipTests -f ./BinaryCalculatorWebapp/pom.xml'
       }
     }
+    
     stage('Build and push image with Container Builder') {
       steps {
         container('gcloud') {
           sh "/builder/google-cloud-sdk/bin/gcloud builds submit -t ${IMAGE_TAG} ./BinaryCalculatorWebapp/"
+        }
+      }
+    }
+    
+    stage('Deploy to GKE') {
+      steps {
+        container('kubectl') {
+          sh """
+            /builder/google-cloud-sdk/bin/gcloud container clusters get-credentials ${CLUSTER} --zone ${CLUSTER_ZONE} --project ${PROJECT}
+            /builder/google-cloud-sdk/bin/kubectl set image deployment/${APP_NAME} ${APP_NAME}=${IMAGE_TAG} --record
+          """
         }
       }
     }
