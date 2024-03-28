@@ -1,17 +1,1 @@
-pipeline {
-    agent {
-    docker {
-        image 'alpine'
-    }
-}
 
-    stages {
-        stage('Ping Jenkins Master') {
-            steps {
-                script {
-                    sh 'ping -c 4 34.47.26.157'  // Replace '34.47.26.157' with your Jenkins master IP
-                }
-            }
-        }
-    }
-}
