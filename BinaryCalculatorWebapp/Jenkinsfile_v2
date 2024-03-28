@@ -10,7 +10,7 @@ pipeline {
   
   agent {
     kubernetes {
-      label 'my-custom-label' // Change the label to match the nodes you want to use
+      label 'beta.kubernetes.io/arch=amd64' // Change the label to match the nodes you want to use
       defaultContainer 'custom-container' // Change this to the name of your custom container
       yaml """
 apiVersion: v1
