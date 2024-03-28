@@ -11,7 +11,7 @@ pipeline {
   agent {
     kubernetes {
       label 'my-custom-label' // Change the label to match the nodes you want to use
-      defaultContainer 'jnlp'
+      defaultContainer 'custom-container' // Change this to the name of your custom container
       yaml """
 apiVersion: v1
 kind: Pod
@@ -22,12 +22,11 @@ spec:
   # Use service account that can deploy to all namespaces
   serviceAccountName: cd-jenkins
   containers:
-  - name: gcloud
-    image: gcr.io/cloud-builders/gcloud
-  
-  - name: kubectl
-    image: gcr.io/cloud-builders/kubectl
-  
+  - name: custom-container
+    image: your-custom-image:tag
+    command:
+    - cat
+    tty: true
 """
     }
   }
