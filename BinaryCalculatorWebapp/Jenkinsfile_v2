@@ -8,9 +8,9 @@ pipeline {
     JENKINS_CRED = "green-tract-379622"
   }
   
-agent {
+  agent {
     kubernetes {
-      label 'sample-app'
+      label 'my-custom-label' // Change the label to match the nodes you want to use
       defaultContainer 'jnlp'
       yaml """
 apiVersion: v1
