@@ -23,7 +23,7 @@ spec:
   serviceAccountName: cd-jenkins
   containers:
   - name: custom-container
-    image: your-custom-image:tag
+    image: northamerica-northeast2-docker.pkg.dev/useful-variety-415821/sofe3980u/binarycalculator:latest
     command:
     - cat
     tty: true
