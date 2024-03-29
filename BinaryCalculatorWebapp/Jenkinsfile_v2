@@ -31,11 +31,11 @@ pipeline {
         
         stage('Deploy to GKE') {
             steps {
-                script {
-                    sh "Downloads/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=downloads/useful-variety-415821-c0957804e409.json"
-                    sh "Downloads/google-cloud-sdk/bin/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
-                    sh "Downloads/google-cloud-sdk/bin/kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}"
-                }
+               script {
+    sh "C:\\Users\\jumia\\Downloads\\google-cloud-sdk\\bin\\gcloud auth activate-service-account --key-file=C:\\Users\\jumia\\Downloads\\useful-variety-415821-c0957804e409.json"
+    sh "C:\\Users\\jumia\\Downloads\\google-cloud-sdk\\bin\\gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
+    sh "C:\\Users\\jumia\\Downloads\\google-cloud-sdk\\bin\\kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}"
+}
             }
         }
     }
