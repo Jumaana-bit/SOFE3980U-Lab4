@@ -1,5 +1,4 @@
 pipeline {
-pipeline {
     agent any
     tools {
         maven 'maven' // Specify the Maven installation name configured in Global Tool Configuration
@@ -42,4 +41,4 @@ pipeline {
             }
         }
     }
-}}
+}
