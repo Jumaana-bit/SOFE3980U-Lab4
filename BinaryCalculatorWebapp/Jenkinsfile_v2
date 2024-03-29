@@ -5,7 +5,7 @@ tools {
     }
   environment {
     PROJECT = "'useful-variety-415821'"
-    APP_NAME = "binary-calculator2"
+    APP_NAME = "binarycalculator"
     CLUSTER = "quality"
     CLUSTER_ZONE = "northamerica-northeast1-b"
     IMAGE_TAG = "gcr.io/${PROJECT}/${APP_NAME}"
