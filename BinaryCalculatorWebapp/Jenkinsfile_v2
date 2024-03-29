@@ -1,39 +1,69 @@
 pipeline {
-    agent any
-    tools {
+agent any
+tools {
         maven 'maven' // Specify the Maven installation name configured in Global Tool Configuration
     }
-    environment {
-        GCP_PROJECT = 'useful-variety-415821'
-        GKE_CLUSTER = 'quality'
-        GKE_ZONE = 'northamerica-northeast2'
-        DOCKER_IMAGE = 'northamerica-northeast2-docker.pkg.dev/useful-variety-415821/quality/binarycalculator'
-        K8S_NAMESPACE = 'default'
-        DEPLOYMENT_NAME = 'binarycalculator-deployment'
-        CONTAINER_NAME = 'binarycalculator'
+  environment {
+    PROJECT = "'useful-variety-415821'"
+    APP_NAME = "binary-calculator2"
+    CLUSTER = "quality"
+    CLUSTER_ZONE = "northamerica-northeast1-b"
+    IMAGE_TAG = "gcr.io/${PROJECT}/${APP_NAME}"
+    JENKINS_CRED = "gcp"
+  }
+  
+  agent {
+    kubernetes {
+      label 'sample-app'
+      defaultContainer 'jnlp'
+      yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    component: ci
+spec:
+  # Use service account that can deploy to all namespaces
+  serviceAccountName: cd-jenkins
+  containers:
+  - name: gcloud
+    image: gcr.io/cloud-builders/gcloud
+    command:
+    - cat
+    tty: true
+  - name: kubectl
+    image: gcr.io/cloud-builders/kubectl
+    command:
+    - cat
+    tty: true
+"""
+    }
+  }
+  
+  tools {
+    maven 'maven' 
+  }
+  
+  stages {
+    stage ('Init') {
+      steps {
+        checkout scm
+        sh 'echo "Start of Job"'
+      }
     }
     
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-        
-        stage('Build') {
-            steps {
-                // Assuming Maven is installed and configured in Jenkins
-                sh 'mvn package -DskipTests -f ./BinaryCalculatorWebapp/pom.xml'
-            }
-        }
-        
-        stage('Deploy to GKE') {
-            steps {
-                script {
-                    // Deploy to GKE using kubectl command
-                    sh "kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}"
-                }
-            }
-        }
+    stage ('Build') {
+      steps {
+        sh 'mvn package -DskipTests -f ./BinaryCalculatorWebapp/pom.xml'
+      }
     }
+    
+    stage('Build and push image with Container Builder') {
+      steps {
+        container('gcloud') {
+          sh "/builder/google-cloud-sdk/bin/gcloud builds submit -t ${IMAGE_TAG} ./BinaryCalculatorWebapp/"
+        }
+      }
+    }
+  }
 }
