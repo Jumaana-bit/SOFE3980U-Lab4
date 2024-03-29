@@ -13,7 +13,7 @@ pipeline {
         K8S_NAMESPACE = 'default'
         DEPLOYMENT_NAME ='binarycalculator-deployment'
         CONTAINER_NAME ='binarycalculator'
-        GCP_CREDENTIALS_ID = 'gcp'
+        GCR_IMAGE = "gcr.io/${GCP_PROJECT}/${DOCKER_IMAGE.split('/')[-1]}"
     }
     
     stages {
@@ -30,12 +30,23 @@ pipeline {
             }
         }
         
+        stage('Build and Push Docker Image') {
+            steps {
+                script {
+                    sh "gcloud auth activate-service-account --key-file=downloads/useful-variety-415821-c0957804e409.json"
+                    sh "docker build -t ${GCR_IMAGE} ./BinaryCalculatorWebapp"
+                    sh "docker push ${GCR_IMAGE}"
+                }
+            }
+        }
+        
         stage('Deploy to GKE') {
             steps {
-        container('gcloud') {
-          sh "/builder/google-cloud-sdk/bin/gcloud builds submit -t ${IMAGE_TAG} ./BinaryCalculatorWebapp/"
+                script {
+                    sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
+                    sh "kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${GCR_IMAGE}"
+                }
+            }
         }
-        }
-}
     }
 }
