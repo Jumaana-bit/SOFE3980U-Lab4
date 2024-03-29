@@ -1,12 +1,15 @@
-environment {
-    GCP_PROJECT = 'useful-variety-415821'
-    GKE_CLUSTER = 'quality'
-    GKE_ZONE = 'northamerica-northeast2'
-    DOCKER_IMAGE = 'northamerica-northeast2-docker.pkg.dev/useful-variety-415821/quality/binarycalculator'
-    K8S_NAMESPACE = 'default'
-    DEPLOYMENT_NAME ='binarycalculator-deployment'
-    CONTAINER_NAME ='binarycalculator'
-}
+pipeline {
+    agent any
+    
+    environment {
+        GCP_PROJECT = 'useful-variety-415821'
+        GKE_CLUSTER = 'quality'
+        GKE_ZONE = 'northamerica-northeast2'
+        DOCKER_IMAGE = 'northamerica-northeast2-docker.pkg.dev/useful-variety-415821/quality/binarycalculator'
+        K8S_NAMESPACE = 'default'
+        DEPLOYMENT_NAME ='binarycalculator-deployment'
+        CONTAINER_NAME ='binarycalculator'
+    }
     
     stages {
         stage('Checkout') {
