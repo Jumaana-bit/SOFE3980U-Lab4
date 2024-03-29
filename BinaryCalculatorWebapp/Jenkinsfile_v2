@@ -4,6 +4,8 @@ environment {
     GKE_ZONE = 'northamerica-northeast2'
     DOCKER_IMAGE = 'northamerica-northeast2-docker.pkg.dev/useful-variety-415821/quality/binarycalculator'
     K8S_NAMESPACE = 'default'
+    DEPLOYMENT_NAME ='binarycalculator-deployment'
+    CONTAINER_NAME ='binarycalculator'
 }
     
     stages {
@@ -15,7 +17,7 @@ environment {
         
         stage('Build') {
             steps {
-                sh 'your-build-command'
+                sh 'mvn clean install'
             }
         }
         
@@ -24,7 +26,7 @@ environment {
                 script {
                     gkeCluster(
                         projectId: "${GCP_PROJECT}",
-                        credentialsId: 'your-gcp-service-account-credentials-id',
+                        credentialsId: 'gcp',
                         clusterName: "${GKE_CLUSTER}",
                         location: "${GKE_ZONE}") {
                         sh "kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}:${BUILD_NUMBER}"
