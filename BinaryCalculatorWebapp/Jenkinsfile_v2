@@ -11,8 +11,8 @@ pipeline {
         GKE_ZONE = 'northamerica-northeast2'
         DOCKER_IMAGE = 'northamerica-northeast2-docker.pkg.dev/useful-variety-415821/quality/binarycalculator'
         K8S_NAMESPACE = 'default'
-        DEPLOYMENT_NAME = 'binarycalculator-deployment'
-        CONTAINER_NAME = 'binarycalculator'
+        DEPLOYMENT_NAME ='binarycalculator-deployment'
+        CONTAINER_NAME ='binarycalculator'
     }
     
     stages {
@@ -32,16 +32,10 @@ pipeline {
         stage('Deploy to GKE') {
             steps {
                 script {
-                    // Authenticate with Google Cloud
-                    withCredentials([gcpProject(id: "${GCP_PROJECT}", serviceAccountKeyVariable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                        // Set the environment variable for GOOGLE_APPLICATION_CREDENTIALS
-                        sh 'export GOOGLE_APPLICATION_CREDENTIALS=/var/run/secret/cloud.google.com/projects/${GCP_PROJECT}/serviceaccount.json'
-                        
-                        // Set up gcloud
+                    // Authenticate with Google Cloud using service account key file
+                    withCredentials([file(credentialsId: 'gcp', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
                         sh 'gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}'
-                        
-                        // Update deployment image
                         sh "kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}"
                     }
                 }
