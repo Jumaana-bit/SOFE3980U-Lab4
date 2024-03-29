@@ -30,7 +30,7 @@ pipeline {
                     projectId: env.PROJECT_ID,
                     clusterName: env.CLUSTER_NAME,
                     location: env.LOCATION,
-                    manifestPattern: 'manifest.yaml', // Update this if your manifest file has a different name
+                    manifestPattern: 'values.yaml', // Update this if your manifest file has a different name
                     credentialsId: env.CREDENTIALS_ID,
                     verifyDeployments: true
                 ])
