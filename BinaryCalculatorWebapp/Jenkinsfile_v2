@@ -30,7 +30,7 @@ pipeline {
         }
         stage('Deploy to GKE') {
             steps {
-withCredentials([file(credentialsId: gcp, variable: 'KEY_FILE')]) {
+withCredentials([file(credentialsId: 'gcp', variable: 'KEY_FILE')]) {
                     // Authenticate with Google Cloud using service account key file
                     sh "gcloud auth activate-service-account --key-file=$KEY_FILE"
                 
