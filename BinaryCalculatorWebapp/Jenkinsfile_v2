@@ -1,42 +1,36 @@
-pipeline {
+pipipeline {
     agent any
     
-    tools {
-        maven 'maven' // Specify the Maven installation name configured in Global Tool Configuration
-    }
-    
     environment {
-        PROJECT_ID = 'useful-variety-415821'
-        CLUSTER_NAME = 'quality'
-        LOCATION = 'northamerica-northeast2'
-        CREDENTIALS_ID = 'gcp'
+        GCP_PROJECT = 'useful-variety-415821'
+        GKE_CLUSTER = 'quality'
+        GKE_ZONE = 'northamerica-northeast2'
+        DOCKER_IMAGE = 'northamerica-northeast2-docker.pkg.dev/useful-variety-415821/quality/binarycalculator'
+        K8S_NAMESPACE = 'default'
+        DEPLOYMENT_NAME = 'binarycalculator-deployment'
+        CONTAINER_NAME = 'binarycalculator'
     }
     
     stages {
-        stage('Init') {
+        stage('Checkout') {
             steps {
                 checkout scm
-                sh 'echo "Start of Job"'
             }
         }
         
-        stage('build') {
+        stage('Build') {
             steps {
+                // Assuming Maven is installed and configured in Jenkins
                 sh 'mvn package -DskipTests -f ./BinaryCalculatorWebapp/pom.xml'
             }
         }
         
         stage('Deploy to GKE') {
             steps {
-                step([
-                    $class: 'KubernetesEngineBuilder',
-                    projectId: env.PROJECT_ID,
-                    clusterName: env.CLUSTER_NAME,
-                    location: env.LOCATION,
-                    manifestPattern: 'values.yaml', // Update this if your manifest file has a different name
-                    credentialsId: env.CREDENTIALS_ID,
-                    verifyDeployments: true
-                ])
+                script {
+                    // Deploy to GKE using kubectl command
+                    sh "kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}"
+                }
             }
         }
     }
