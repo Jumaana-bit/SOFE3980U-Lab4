@@ -1,43 +1,23 @@
 pipeline {
     agent any
-    tools {
-        maven 'maven' // Specify the Maven installation name configured in Global Tool Configuration
-    }
     environment {
-        GCP_PROJECT = 'useful-variety-415821'
-        GKE_CLUSTER = 'quality'
-        GKE_ZONE = 'northamerica-northeast2'
-        DOCKER_IMAGE = 'northamerica-northeast2-docker.pkg.dev/useful-variety-415821/quality/binarycalculator'
-        K8S_NAMESPACE = 'default'
-        DEPLOYMENT_NAME ='binarycalculator-deployment'
-        CONTAINER_NAME ='binarycalculator'
+        PROJECT_ID = 'useful-variety-415821'
+        CLUSTER_NAME = 'quality'
+        LOCATION = 'northamerica-northeast2'
+        CREDENTIALS_ID = 'gcp' // Replace 'your_credentials_id' with your actual credentials ID
     }
-    
     stages {
-    stage ('Init') {
-      steps {
-	    checkout scm
-        sh 'echo "Start of Job"'
-      }
-    }
-        
-       stage ('build') {
-      steps {
-        sh 'mvn package -DskipTests -f ./BinaryCalculatorWebapp/pom.xml'
-      }
-    }
-        
         stage('Deploy to GKE') {
-            steps {
-                script {
-                    gkeCluster(
-                        projectId: "${GCP_PROJECT}",
-                        credentialsId: 'gcp',
-                        clusterName: "${GKE_CLUSTER}",
-                        location: "${GKE_ZONE}") {
-                        sh "kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}"
-                    }
-                }
+            steps{
+                step([
+                    $class: 'KubernetesEngineBuilder',
+                    projectId: env.PROJECT_ID,
+                    clusterName: env.CLUSTER_NAME,
+                    location: env.LOCATION,
+                    manifestPattern: 'manifest.yaml',
+                    credentialsId: env.CREDENTIALS_ID,
+                    verifyDeployments: true
+                ])
             }
         }
     }
