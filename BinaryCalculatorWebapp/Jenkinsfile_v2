@@ -28,14 +28,20 @@ pipeline {
                 sh 'mvn package -DskipTests -f ./BinaryCalculatorWebapp/pom.xml'
             }
         }
-        
         stage('Deploy to GKE') {
             steps {
-               script {
-    sh "C:/Users/jumia/Downloads/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=C:/Users/jumia/Downloads/useful-variety-415821-c0957804e409.json"
-    sh "C:/Users/jumia/Downloads/google-cloud-sdk/bin/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
-    sh "C:/Users/jumia/Downloads/google-cloud-sdk/bin/kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}"
-}
+withCredentials([file(credentialsId: gcp, variable: 'KEY_FILE')]) {
+                    // Authenticate with Google Cloud using service account key file
+                    sh "gcloud auth activate-service-account --key-file=$KEY_FILE"
+                
+                    // Set the GCP project
+                    sh 'gcloud config set project $GCP_PROJECT'
+                
+                    // Set the GKE cluster context
+                    sh 'gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE'
+                
+                    // Deploy to GKE
+                    sh "kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$DOCKER_IMAGE"
             }
         }
     }
