@@ -12,17 +12,18 @@ pipeline {
     }
     
     stages {
-        stage('Checkout') {
-            steps {
-                git credentialsId: 'Github_token', url: 'https://github.com/Jumaana-bit/SOFE3980U-Lab4'
-            }
-        }
+    stage ('Init') {
+      steps {
+	    checkout scm
+        sh 'echo "Start of Job"'
+      }
+    }
         
-        stage('Build') {
-            steps {
-                sh 'mvn clean install'
-            }
-        }
+       stage ('build') {
+      steps {
+        sh 'mvn package -DskipTests -f ./BinaryCalculatorWebapp/pom.xml'
+      }
+    }
         
         stage('Deploy to GKE') {
             steps {
@@ -32,7 +33,7 @@ pipeline {
                         credentialsId: 'gcp',
                         clusterName: "${GKE_CLUSTER}",
                         location: "${GKE_ZONE}") {
-                        sh "kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                        sh "kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}"
                     }
                 }
             }
