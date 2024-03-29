@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git credentialsId: 'Token-Github', url: 'https://github.com/Jumaana-bit/SOFE3980U-Lab4'
+                git credentialsId: 'Github_token', url: 'https://github.com/Jumaana-bit/SOFE3980U-Lab4'
             }
         }
         
