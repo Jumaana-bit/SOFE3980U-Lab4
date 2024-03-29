@@ -1,71 +1,36 @@
-pipeline {
-  environment {
-    PROJECT = "useful-variety-415821"
-    APP_NAME = "binary-calculator2"
-    CLUSTER = "sofe3980u"
-    CLUSTER_ZONE = "northamerica-northeast1-b"
-    IMAGE_TAG = "gcr.io/${PROJECT}/${APP_NAME}"
-    JENKINS_CRED = "green-tract-379622"
-  }
-  
-  agent {
-    kubernetes {
-      label 'beta.kubernetes.io/arch=amd64' // Change the label to match the nodes you want to use
-      defaultContainer 'custom-container' // Change this to the name of your custom container
-      yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    component: ci
-spec:
-  # Use service account that can deploy to all namespaces
-  serviceAccountName: cd-jenkins
-  containers:
-  - name: custom-container
-    image: northamerica-northeast2-docker.pkg.dev/useful-variety-415821/sofe3980u/binarycalculator:latest
-    command:
-    - cat
-    tty: true
-"""
-    }
-  }
-  
-  tools {
-    maven 'maven' 
-  }
-  
-  stages {
-    stage ('Init') {
-      steps {
-        checkout scm
-        sh 'echo "Start of Job"'
-      }
-    }
+environment {
+    GCP_PROJECT = 'useful-variety-415821'
+    GKE_CLUSTER = 'quality'
+    GKE_ZONE = 'northamerica-northeast2'
+    DOCKER_IMAGE = 'northamerica-northeast2-docker.pkg.dev/useful-variety-415821/quality/binarycalculator'
+    K8S_NAMESPACE = 'default'
+}
     
-    stage ('build') {
-      steps {
-        sh 'mvn package -DskipTests -f ./BinaryCalculatorWebapp/pom.xml'
-      }
-    }
-    
-    stage('Build and push image with Container Builder') {
-      steps {
-        container('gcloud') {
-          sh "/builder/google-cloud-sdk/bin/gcloud builds submit -t ${IMAGE_TAG} ./BinaryCalculatorWebapp/"
+    stages {
+        stage('Checkout') {
+            steps {
+                git credentialsId: 'Token-Github', url: 'https://github.com/Jumaana-bit/SOFE3980U-Lab4'
+            }
         }
-      }
-    }
-    
-    stage('Deploy to GKE') {
-      steps {
-        container('kubectl') {
-          sh """
-            /builder/google-cloud-sdk/bin/gcloud container clusters get-credentials ${CLUSTER} --zone ${CLUSTER_ZONE} --project ${PROJECT}
-            /builder/google-cloud-sdk/bin/kubectl set image deployment/${APP_NAME} ${APP_NAME}=${IMAGE_TAG} --record
-          """
+        
+        stage('Build') {
+            steps {
+                sh 'your-build-command'
+            }
         }
-      }
+        
+        stage('Deploy to GKE') {
+            steps {
+                script {
+                    gkeCluster(
+                        projectId: "${GCP_PROJECT}",
+                        credentialsId: 'your-gcp-service-account-credentials-id',
+                        clusterName: "${GKE_CLUSTER}",
+                        location: "${GKE_ZONE}") {
+                        sh "kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                    }
+                }
+            }
+        }
     }
-  }
 }
