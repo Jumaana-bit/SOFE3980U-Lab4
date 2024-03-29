@@ -43,6 +43,7 @@ withCredentials([file(credentialsId: gcp, variable: 'KEY_FILE')]) {
                     // Deploy to GKE
                     sh "kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=$DOCKER_IMAGE"
             }
+}
         }
     }
 }
