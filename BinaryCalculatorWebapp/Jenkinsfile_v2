@@ -32,9 +32,9 @@ pipeline {
         stage('Deploy to GKE') {
             steps {
                script {
-    cmd "C:/Users/jumia/Downloads/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=C:/Users/jumia/Downloads/useful-variety-415821-c0957804e409.json"
-    cmd "C:/Users/jumia/Downloads/google-cloud-sdk/bin/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
-    cmd "C:/Users/jumia/Downloads/google-cloud-sdk/bin/kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}"
+    bat "C:/Users/jumia/Downloads/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=C:/Users/jumia/Downloads/useful-variety-415821-c0957804e409.json"
+    bat "C:/Users/jumia/Downloads/google-cloud-sdk/bin/gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
+    bat "C:/Users/jumia/Downloads/google-cloud-sdk/bin/kubectl set image deployment/${DEPLOYMENT_NAME} ${CONTAINER_NAME}=${DOCKER_IMAGE}"
 }
             }
         }
