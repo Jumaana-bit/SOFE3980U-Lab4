@@ -36,5 +36,6 @@ pipeline {
           sh "/builder/google-cloud-sdk/bin/gcloud builds submit -t ${IMAGE_TAG} ./BinaryCalculatorWebapp/"
         }
         }
+}
     }
 }
