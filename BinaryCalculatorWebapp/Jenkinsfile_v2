@@ -1,6 +1,8 @@
 pipeline {
     agent any
-    
+    tools {
+        maven 'Maven-3.9.6' // Specify the Maven installation name configured in Global Tool Configuration
+    }
     environment {
         GCP_PROJECT = 'useful-variety-415821'
         GKE_CLUSTER = 'quality'
