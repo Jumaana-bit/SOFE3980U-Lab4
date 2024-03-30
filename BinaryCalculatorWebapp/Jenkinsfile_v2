@@ -3,7 +3,7 @@ pipeline {
 	PROJECT = "useful-variety-415821"
     APP_NAME = "binarycalculator-deployment"
     CLUSTER = "sofe3980u"
-    CLUSTER_ZONE = "northamerica-northeast2"
+    CLUSTER_ZONE = "northamerica-northeast1-b"
     IMAGE_TAG = "gcr.io/${PROJECT}/${APP_NAME}"
     JENKINS_CRED = "6997199e-9a41-4f9a-bc2c-efe74d4446f3"
   }
